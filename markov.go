@@ -1,10 +1,9 @@
 /*
  *******************************************************************************
- *                        (C) Copyright 2022 Fantasy Inc                       *
  * Created: 14/11/2022                                                         *
  *                                                                             *
  * Programmer(s):                                                              *
- * - Micrified                                                                 *
+ * - Charles Randolph                                                          *
  *                                                                             *
  * Description:                                                                *
  *  Simple markov chain generator                                              *
@@ -57,6 +56,11 @@ func (g *Generator) Build (in *io.Reader,
 	var i int;
 	scanner := bufio.NewScanner(bufio.NewReader(*in))
 	scanner.Split(f);
+
+	// Set table if needed
+	if nil == g.Table {
+		g.Table = map[string]*State{}
+	}
 	
 	// Construct the prefix: requires Prefix_len words
 	prefix := make([]string, g.Prefix_len)
