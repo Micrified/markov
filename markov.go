@@ -51,7 +51,8 @@ func (g *Generator) keyFrom (prefixes []string) string {
 }
 
 // [External] Builds prefix-state hashmap from word-based input stream
-func (g *Generator) Build (in *io.Reader, 
+func (g *Generator) Build (in *io.Reader,
+	                       prefix_len int,
 	                       f func([]byte, bool)(int, []byte, error)) error {
 	var i int;
 	scanner := bufio.NewScanner(bufio.NewReader(*in))
@@ -61,6 +62,9 @@ func (g *Generator) Build (in *io.Reader,
 	if nil == g.Table {
 		g.Table = map[string]*State{}
 	}
+
+	// Set prefix length
+	g.Prefix_len = prefix_len;
 	
 	// Construct the prefix: requires Prefix_len words
 	prefix := make([]string, g.Prefix_len)
