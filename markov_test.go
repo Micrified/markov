@@ -91,10 +91,13 @@ func TestMarkovInvalidCallWhileInvalidFileInput (t *testing.T) {
 	var g markov.Generator;
 	var r io.Reader;
 
-	g.Build(&r, 6, bufio.ScanWords);
+	err := g.Build(&r, 6, bufio.ScanWords);
+	if nil == err || nil == g.Err {
+		t.Errorf("Illegal conditon: Non-nil error must be returned and set in generator err field");
+	}
 
 	string, err := g.String(5);
 	if nil == err || "" != string {
-		t.Errorf("Illegal condition: Generator cannot generate strings while in error state")
+		t.Errorf("Illegal condition: Generator cannot generate strings while in error state");
 	}
 }
