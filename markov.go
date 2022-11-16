@@ -55,16 +55,20 @@ func (g *Generator) Build (in *io.Reader,
 	                       prefix_len int,
 	                       f func([]byte, bool)(int, []byte, error)) error {
 	var i int;
-	scanner := bufio.NewScanner(bufio.NewReader(*in))
-	scanner.Split(f);
+	var scanner *bufio.Scanner;
 
-	// Set table if needed
-	if nil == g.Table {
-		g.Table = map[string]*State{}
+	// Check args
+	if nil == in || nil == *in {
+		return errors.New("invalid argument: in");
+	} else if nil == f {
+		return errors.New("invalid argument: f")
+	} else {
+		scanner = bufio.NewScanner(*in)
+		scanner.Split(f);
 	}
 
-	// Set prefix length
-	g.Prefix_len = prefix_len;
+	// Set/reset table 
+	*g = Generator{Table: map[string]*State{}, Prefix_len: prefix_len}
 	
 	// Construct the prefix: requires Prefix_len words
 	prefix := make([]string, g.Prefix_len)
@@ -89,7 +93,8 @@ func (g *Generator) Build (in *io.Reader,
 		prefix = append(prefix[1:], suffix);
 	}
 
-	return nil;
+	// Return potential scanner errors
+	return scanner.Err();
 }
 
 // [External] Generates and returns a markov chain string; else non-nil error

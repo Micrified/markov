@@ -31,18 +31,18 @@ func TestMarkovTwoPrefixGenerator (t *testing.T) {
 	reader := io.Reader(string_reader);
 	err := g.Build(&reader, prefix, bufio.ScanWords);
 	if nil != err {
-		t.Errorf("Non-nil error on Build: %s", err.Error());
+		t.Errorf("Unexpected outcome: Build() returned non-nil error: %s", err.Error());
 	}
 	
 	// Generate a bunch of markov with space delimiters
 	for i := 0; i < 100; i++ {
 		m, err := g.String(limit);
 		if nil != err {
-			t.Errorf("Non-nil error on DelimitedString: %s", err.Error());
+			t.Errorf("Unexpected outcome: String() returned non-nil error : %s", err.Error());
 		}
 		ws := strings.Split(m, " ");
 		if (len(ws) < (prefix+1) || len(ws) > limit) {
-			t.Errorf("Output exceeds word boundaries: (%d,%d]", prefix, limit);
+			t.Errorf("Unexpected outcome: Output exceeds word boundaries: (%d,%d]", prefix, limit);
 		}
 	}
 
@@ -50,11 +50,11 @@ func TestMarkovTwoPrefixGenerator (t *testing.T) {
 	for i := 0; i < 100; i++ {
 		m, err := g.DelimitedString(limit, "-");
 		if nil != err {
-			t.Errorf("Non-nil error on DelimitedString: %s", err.Error());
+			t.Errorf("Unexpected outcome: DelimitedString() returns non-nil error: %s", err.Error());
 		}
 		ws := strings.Split(m, "-")
 		if (len(ws) < (prefix+1) || len(ws) > limit) {
-			t.Errorf("Output exceeds word boundaries: (%d,%d]", prefix, limit);
+			t.Errorf("Invalid output: Synthesized phrase exceeds word boundaries: (%d,%d]", prefix, limit);
 		}
 	}
 }
@@ -68,6 +68,16 @@ func TestMarkovIllegalPrefixLength (t *testing.T) {
 	reader := io.Reader(string_reader);
 	err := g.Build(&reader, prefix, bufio.ScanWords);
 	if nil == err {
-		t.Errorf("Build should fail if prefix is longer than input!");
+		t.Errorf("Unexpected outcome: Build must fail if prefix is longer than input!");
+	}
+}
+
+func TestMarkovFileInput (t *testing.T) {
+	var g markov.Generator;
+	var r io.Reader;
+
+	err := g.Build(&r, 6, bufio.ScanWords);
+	if nil == err {
+		t.Errorf("Illegal condition: Generator accepted invalid reader");
 	}
 }
