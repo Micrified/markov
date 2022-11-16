@@ -63,11 +63,11 @@ func (g *Generator) Build (in *io.Reader,
 
 	// Check args
 	if nil == in || nil == *in {
-		err = errors.New("invalid argument: in");
+		err = errors.New("invalid argument: nil reader or reader pointer");
 	} else if prefix_len < 1 {
 		err = errors.New("invalid argument: prefix out of bounds [1,inf)");
 	} else if nil == f {
-		err = errors.New("invalid argument: f");
+		err = errors.New("invalid argument: invalid split function");
 	} else {
 		scanner = bufio.NewScanner(*in)
 		scanner.Split(f);
