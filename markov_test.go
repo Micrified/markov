@@ -72,12 +72,17 @@ func TestMarkovIllegalPrefixLength (t *testing.T) {
 	}
 }
 
-func TestMarkovFileInput (t *testing.T) {
+func TestMarkovInvalidFileInput (t *testing.T) {
 	var g markov.Generator;
 	var r io.Reader;
 
 	err := g.Build(&r, 6, bufio.ScanWords);
 	if nil == err {
 		t.Errorf("Illegal condition: Generator accepted invalid reader");
+	}
+
+	string, err := g.String(5);
+	if nil == err || "" != string {
+		t.Errorf("Illegal condition: Generator cannot generate strings while in error state")
 	}
 }
