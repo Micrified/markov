@@ -59,49 +59,50 @@ func (g *Generator) Build (in *io.Reader,
 	var i int;
 	var scanner *bufio.Scanner;
 	var prefix []string;
+	var table map[string]*State;
 
 	// Check args
 	if nil == in || nil == *in {
 		err = errors.New("invalid argument: in");
+	} else if prefix_len < 1 {
+		err = errors.New("invalid argument: prefix out of bounds [1,inf)");
 	} else if nil == f {
 		err = errors.New("invalid argument: f");
 	} else {
 		scanner = bufio.NewScanner(*in)
 		scanner.Split(f);
 	}
-
-	// Set/reset table 
-	*g = Generator{Table: map[string]*State{}, Prefix_len: prefix_len, Err: nil}
 	
 	// Construct the prefix: requires Prefix_len words
 	if nil == err {
-		prefix = make([]string, g.Prefix_len);
-		for i = 0; scanner.Scan() && i < g.Prefix_len; i++ {
+		prefix = make([]string, prefix_len);
+		for i = 0; scanner.Scan() && i < prefix_len; i++ {
 			prefix[i] = scanner.Text();
 		}
-		if i < g.Prefix_len {
+		if i < prefix_len {
 			err = errors.New("prefix may not exceed input size");
 		}
 	}
 
 	// Install suffix; continue with all other prefixes 
 	if nil == err {
+		table = make(map[string]*State);
 		for scanner.Scan() {
 			var state *State;
 			key, suffix := g.keyFrom(prefix), scanner.Text();
-			if _, ok := g.Table[key]; ok {
-				state = g.Table[key];
+			if _, ok := table[key]; ok {
+				state = table[key];
 			} else {
 				state = &State{Prefix: prefix, Suffixes: []string{}}
-				g.Table[key] = state;
+				table[key] = state;
 			}
 			state.Suffixes = append(state.Suffixes, suffix);
 			prefix = append(prefix[1:], suffix);
 		}
 	}
 
-	// Install/return potential scanner errors
-	g.Err = err;
+	// Set table; Install/return potential scanner errors
+	*g = Generator{Table: table, Prefix_len: prefix_len, Err: err};
 	return err;
 }
 
