@@ -18,7 +18,7 @@ import (
 	"bufio"
 	"testing"
 	"strings"
-	"markov"
+	"github.com/Micrified/markov"
 )
 
 func TestMarkovTwoPrefixGenerator (t *testing.T) {
